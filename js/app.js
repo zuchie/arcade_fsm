@@ -18,7 +18,7 @@ Enemy.prototype.update = function(dt) {
     // which will ensure the game runs at the same speed for
     // all computers.
     this.x += this.speed * 100 * dt; 
-    if(this.x > 500) {
+    if(this.x > 500) { // out screen, move from start position 
         this.x = -100;
     }
 }
@@ -34,25 +34,28 @@ Enemy.prototype.render = function() {
 var Player = function(initX, initY) {
     this.x = initX;
     this.y = initY;
-    //this.sprite = 'images/char-boy.png';
     this.sprite = 'images/char-cat-girl.png';
 }
 
+/*
 Player.prototype.update = function(dt) {
-    //this.y -= 100 * dt; 
 }
+*/
 
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
 }
 
+/*
+ * Move direction + pixels by key input.
+ */
 Player.prototype.handleInput = function(inputKey) {
     switch(inputKey) {
         case 'left':
-            this.x += -100; 
+            this.x -= 100; 
             break;
         case 'up':
-            this.y += -82; 
+            this.y -= 82; 
             break;
         case 'right':
             this.x += 100; 
@@ -63,19 +66,23 @@ Player.prototype.handleInput = function(inputKey) {
     }
 }
 
+/*
+ * Reset position when moving out of bound.
+ */
 Player.prototype.reset = function() {
-    if(this.y < 0) { // reach water 
+    if(this.y < 0) { // reach water, win, restart 
         this.x = 200;
-        this.y = 400; 
+        this.y = 386; 
+        score++;
     }
-    if(this.y > 400) { // reach lower bound 
-        this.y = 400; 
+    if(this.y > 386) { // reach lower bound, keep still 
+        this.y = 386; 
     }
-    if(this.x < 0) { // reach left bound
-        this.x = 400; 
-    }
-    if(this.x > 400) { // reach right bound
+    if(this.x < 0) { // reach left bound, keep still 
         this.x = 0; 
+    }
+    if(this.x > 400) { // reach right bound, keep still 
+        this.x = 400; 
     }
 }
 
@@ -83,16 +90,13 @@ Player.prototype.reset = function() {
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
 var allEnemies = new Array();
-allEnemies.push(new Enemy(200, 58, 3)); 
-allEnemies.push(new Enemy(500, 58, 3)); 
-allEnemies.push(new Enemy(000, 58, 4)); 
-allEnemies.push(new Enemy(000, 140, 2)); 
-allEnemies.push(new Enemy(300, 140, 2)); 
+allEnemies.push(new Enemy(200, 58, 3)); // add enemies 
+allEnemies.push(new Enemy(500, 58, 2)); 
+allEnemies.push(new Enemy(200, 140, 2)); 
+allEnemies.push(new Enemy(400, 140, 1)); 
 allEnemies.push(new Enemy(100, 222, 1)); 
 allEnemies.push(new Enemy(300, 222, 2)); 
-allEnemies.push(new Enemy(500, 222, 1)); 
-var player = new Player(200, 386);
-
+var player = new Player(200, 386); // add player
 
 // This listens for key presses and sends the keys to your
 // Player.handleInput() method. You don't need to modify this.

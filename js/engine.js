@@ -24,6 +24,7 @@ var Engine = (function(global) {
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
         lastTime;
+        score = 0;
 
     canvas.width = 505;
     canvas.height = 606;
@@ -64,9 +65,9 @@ var Engine = (function(global) {
      * game loop.
      */
     function init() {
-        reset();
-        lastTime = Date.now();
-        main();
+        reset(); // main() inside
+        //lastTime = Date.now();
+        //main();
     }
 
     /* This function is called by main (our game loop) and itself calls all
@@ -94,22 +95,34 @@ var Engine = (function(global) {
         allEnemies.forEach(function(enemy) {
             enemy.update(dt);
         });
-        player.update();
+        //player.update(); // not use
     }
 
+    /* This function detects collision of the enemy and player
+     * and score -1 when collided.
+     */
     function checkCollisions() {
         allEnemies.forEach(function(enemy) {
             if(enemy.y == player.y) {
                 if(((enemy.x < player.x) && (enemy.x > (player.x - 70))) || 
                     ((enemy.x > player.x) && (enemy.x < (player.x + 50)))) {
-                    setTimeout(function(){
-                        player.x = 200; // to init pos
-                        player.y = 386; 
-                    }, 80);
+                    //setTimeout(function(){ // a delay to smooth animation
+                    player.x = 200; // to init pos
+                    player.y = 386; 
+                    score--; // collided, decrement score
+                    //}, 80);
                 }
             }
         });
     }
+
+    /* This function draws score on canvas.
+     */
+    function drawScore() {
+        ctx.font = "20px Arial";
+        ctx.fillStyle = "white";
+        ctx.fillText("Score: "+score, 5, 70);
+    } 
 
     /* This function initially draws the "game level", it will then call
      * the renderEntities function. Remember, this function is called every
@@ -150,8 +163,8 @@ var Engine = (function(global) {
             }
         }
 
-
         renderEntities();
+        drawScore();
     }
 
     /* This function is called by the render function and is called on each game
@@ -173,8 +186,62 @@ var Engine = (function(global) {
      * handle game reset states - maybe a new game menu or a game over screen
      * those sorts of things. It's only called once by the init() method.
      */
+    // This function creates a game start screen for user to choose player.
     function reset() {
-        // noop
+        var playerNo;
+            playerImages = [ // players to choose from
+                'images/char-boy.png',   
+                'images/char-cat-girl.png',   
+                'images/char-pink-girl.png', 
+                'images/char-princess-girl.png'   
+            ],
+            mouse = {
+                x: 0,
+                y: 0    
+            };
+        // draw players
+        for (playerNo = 0; playerNo < playerImages.length; playerNo++) {
+            ctx.drawImage(Resources.get(playerImages[playerNo]), playerNo * 101, 300);
+        }
+        // display instruction
+        ctx.font = "20px monospace";
+        ctx.fillStyle = "navy";
+        ctx.fillText("Click to choose a player", 60, 300);
+        // mouse tracing
+        canvas.addEventListener('mousemove', function(e){
+            mouse.x = e.clientX;
+            mouse.y = e.clientY;
+        });
+        // choose a player according to mouse click coordinates. 
+        // exit start screen, enter game screen 
+        canvas.addEventListener("click", function choosePlayer(e) {
+            if(mouse.y > 370 && mouse.y < 450) { // player1
+                if(mouse.x > 415 && mouse.x < 485) {
+                    player.sprite = playerImages[0];    
+                    canvas.removeEventListener("click", choosePlayer);
+                    lastTime = Date.now();
+                    main(); // enter game
+                }
+                else if(mouse.x >= 518 && mouse.x < 585) { // player2
+                    player.sprite = playerImages[1];    
+                    canvas.removeEventListener("click", choosePlayer);
+                    lastTime = Date.now();
+                    main();
+                }
+                else if(mouse.x >= 618 && mouse.x < 685) { // player3
+                    player.sprite = playerImages[2];    
+                    canvas.removeEventListener("click", choosePlayer);
+                    lastTime = Date.now();
+                    main();
+                }
+                else if(mouse.x >= 715 && mouse.x < 788) { // player4
+                    player.sprite = playerImages[3];    
+                    canvas.removeEventListener("click", choosePlayer);
+                    lastTime = Date.now();
+                    main();
+                }
+            }
+        });
     }
 
     /* Go ahead and load all of the images we know we're going to need to
@@ -187,7 +254,9 @@ var Engine = (function(global) {
         'images/grass-block.png',
         'images/enemy-bug.png',
         'images/char-boy.png',
-        'images/char-cat-girl.png'
+        'images/char-cat-girl.png',
+        'images/char-pink-girl.png',
+        'images/char-princess-girl.png'
     ]);
     Resources.onReady(init);
 
