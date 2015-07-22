@@ -90,10 +90,10 @@ var Score = function(initNum) {
 };
 Score.prototype.add = function(num) {
     this.score += num;
-}
+};
 Score.prototype.minus = function(num) {
     this.score -= num;
-}
+};
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
