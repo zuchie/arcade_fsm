@@ -1,3 +1,7 @@
+/* app.js
+ * This file provides Enemy, Player, and Scoreboard constructors and
+ * prototypes, then instantiate them.
+ */
 "use strict";
 // Enemies our player must avoid
 var Enemy = function(initX, initY, width, height, speed) {
