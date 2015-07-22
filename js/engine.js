@@ -23,7 +23,7 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        lastTime;
+        lastTime,
         score = 0;
 
     canvas.width = 505;
@@ -58,7 +58,7 @@ var Engine = (function(global) {
          * function again as soon as the browser is able to draw another frame.
          */
         win.requestAnimationFrame(main);
-    };
+    }
 
     /* This function does some initial setup that should only occur once,
      * particularly setting the lastTime variable that is required for the
@@ -188,7 +188,7 @@ var Engine = (function(global) {
      */
     // This function creates a game start screen for user to choose player.
     function reset() {
-        var playerNo;
+        var playerNo,
             playerImages = [ // players to choose from
                 'images/char-boy.png',   
                 'images/char-cat-girl.png',   
@@ -214,7 +214,7 @@ var Engine = (function(global) {
         });
         // choose a player according to mouse click coordinates. 
         // exit start screen, enter game screen 
-        canvas.addEventListener("click", function choosePlayer(e) {
+        canvas.addEventListener("click", function choosePlayer() {
             if(mouse.y > 370 && mouse.y < 450) { // player1
                 if(mouse.x > 415 && mouse.x < 485) {
                     player.sprite = playerImages[0];    

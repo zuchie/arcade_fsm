@@ -9,7 +9,7 @@ var Enemy = function(initX, initY, speed) {
     // The image/sprite for our enemies, this uses
     // a helper we've provided to easily load images
     this.sprite = 'images/enemy-bug.png';
-}
+};
 
 // Update the enemy's position, required method for game
 // Parameter: dt, a time delta between ticks
@@ -21,12 +21,12 @@ Enemy.prototype.update = function(dt) {
     if(this.x > 500) { // out screen, move from start position 
         this.x = -100;
     }
-}
+};
 
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
 
 // Now write your own player class
 // This class requires an update(), render() and
@@ -35,7 +35,7 @@ var Player = function(initX, initY) {
     this.x = initX;
     this.y = initY;
     this.sprite = 'images/char-cat-girl.png';
-}
+};
 
 /*
 Player.prototype.update = function(dt) {
@@ -44,7 +44,7 @@ Player.prototype.update = function(dt) {
 
 Player.prototype.render = function() {
     ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
-}
+};
 
 /*
  * Move direction + pixels by key input.
@@ -64,7 +64,7 @@ Player.prototype.handleInput = function(inputKey) {
             this.y += 82; 
             break;
     }
-}
+};
 
 /*
  * Reset position when moving out of bound.
@@ -84,12 +84,12 @@ Player.prototype.reset = function() {
     if(this.x > 400) { // reach right bound, keep still 
         this.x = 400; 
     }
-}
+};
 
 // Now instantiate your objects.
 // Place all enemy objects in an array called allEnemies
 // Place the player object in a variable called player
-var allEnemies = new Array();
+var allEnemies = [];
 allEnemies.push(new Enemy(200, 58, 3)); // add enemies 
 allEnemies.push(new Enemy(500, 58, 2)); 
 allEnemies.push(new Enemy(200, 140, 2)); 
