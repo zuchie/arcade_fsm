@@ -13,7 +13,7 @@
  * the canvas' context (ctx) object globally available to make writing app.js
  * a little simpler to work with.
  */
-
+"use strict";
 var Engine = (function(global) {
     /* Predefine the variables we'll be using within this scope,
      * create the canvas element, grab the 2D context for that canvas
@@ -23,8 +23,7 @@ var Engine = (function(global) {
         win = global.window,
         canvas = doc.createElement('canvas'),
         ctx = canvas.getContext('2d'),
-        lastTime,
-        score = 0;
+        lastTime;
 
     canvas.width = 505;
     canvas.height = 606;
@@ -103,15 +102,12 @@ var Engine = (function(global) {
      */
     function checkCollisions() {
         allEnemies.forEach(function(enemy) {
-            if(enemy.y == player.y) {
-                if(((enemy.x < player.x) && (enemy.x > (player.x - 70))) || 
-                    ((enemy.x > player.x) && (enemy.x < (player.x + 50)))) {
-                    //setTimeout(function(){ // a delay to smooth animation
-                    player.x = 200; // to init pos
-                    player.y = 386; 
-                    score--; // collided, decrement score
-                    //}, 80);
-                }
+            if(enemy.x < player.x + player.width - 30 &&
+               enemy.x + enemy.width - 30 > player.x &&
+               enemy.y < player.y + player.height - 88 &&
+               enemy.height + enemy.y - 88 > player.y) {
+                player.toInitLoc(); // to init location 
+                scoreBoard.score--; // collided, decrement score
             }
         });
     }
@@ -121,7 +117,7 @@ var Engine = (function(global) {
     function drawScore() {
         ctx.font = "20px Arial";
         ctx.fillStyle = "white";
-        ctx.fillText("Score: "+score, 5, 70);
+        ctx.fillText("Score: "+scoreBoard.score, 5, 70);
     } 
 
     /* This function initially draws the "game level", it will then call
@@ -182,26 +178,26 @@ var Engine = (function(global) {
         player.render();
     }
 
+    var mouse = { // mouse position
+            x: 0,
+            y: 0    
+        },
+        playerImages = [ // players to choose from
+            'images/char-boy.png',   
+            'images/char-cat-girl.png',   
+            'images/char-pink-girl.png', 
+            'images/char-princess-girl.png'   
+        ];
     /* This function does nothing but it could have been a good place to
      * handle game reset states - maybe a new game menu or a game over screen
      * those sorts of things. It's only called once by the init() method.
      */
     // This function creates a game start screen for user to choose player.
     function reset() {
-        var playerNo,
-            playerImages = [ // players to choose from
-                'images/char-boy.png',   
-                'images/char-cat-girl.png',   
-                'images/char-pink-girl.png', 
-                'images/char-princess-girl.png'   
-            ],
-            mouse = {
-                x: 0,
-                y: 0    
-            };
+        var playerNo;
         // draw players
         for (playerNo = 0; playerNo < playerImages.length; playerNo++) {
-            ctx.drawImage(Resources.get(playerImages[playerNo]), playerNo * 101, 300);
+            ctx.drawImage(Resources.get(playerImages[playerNo]), playerNo * 101, 300, 101, 171);
         }
         // display instruction
         ctx.font = "20px monospace";
@@ -213,35 +209,50 @@ var Engine = (function(global) {
             mouse.y = e.clientY;
         });
         // choose a player according to mouse click coordinates. 
-        // exit start screen, enter game screen 
-        canvas.addEventListener("click", function choosePlayer() {
-            if(mouse.y > 370 && mouse.y < 450) { // player1
-                if(mouse.x > 415 && mouse.x < 485) {
-                    player.sprite = playerImages[0];    
-                    canvas.removeEventListener("click", choosePlayer);
-                    lastTime = Date.now();
-                    main(); // enter game
-                }
-                else if(mouse.x >= 518 && mouse.x < 585) { // player2
-                    player.sprite = playerImages[1];    
-                    canvas.removeEventListener("click", choosePlayer);
-                    lastTime = Date.now();
-                    main();
-                }
-                else if(mouse.x >= 618 && mouse.x < 685) { // player3
-                    player.sprite = playerImages[2];    
-                    canvas.removeEventListener("click", choosePlayer);
-                    lastTime = Date.now();
-                    main();
-                }
-                else if(mouse.x >= 715 && mouse.x < 788) { // player4
-                    player.sprite = playerImages[3];    
-                    canvas.removeEventListener("click", choosePlayer);
-                    lastTime = Date.now();
-                    main();
-                }
+        canvas.addEventListener("click", choosePlayer, false);
+    }
+
+    // Choose player according to mouse click position.
+    function choosePlayer() {
+        if(mouse.y > 370 && mouse.y < 450) { // player1
+            if(mouse.x > 415 && mouse.x < 485) {
+                player.sprite = playerImages[0];    
+                enterGame();
             }
+            else if(mouse.x >= 518 && mouse.x < 585) { // player2
+                player.sprite = playerImages[1];    
+                enterGame();
+            }
+            else if(mouse.x >= 618 && mouse.x < 685) { // player3
+                player.sprite = playerImages[2];    
+                enterGame();
+            }
+            else if(mouse.x >= 715 && mouse.x < 788) { // player4
+                player.sprite = playerImages[3];    
+                enterGame();
+            }
+        }
+    }
+
+    // Enter game screen from start screen.
+    function enterGame() {
+        // Remove start screen event handler.
+        canvas.removeEventListener("click", choosePlayer, false);
+        // This listens for key presses and sends the keys to your
+        // Player.handleInput() method. You don't need to modify this.
+        document.addEventListener('keyup', function(e) {
+            var allowedKeys = {
+                37: 'left',
+                38: 'up',
+                39: 'right',
+                40: 'down'
+            };
+
+            player.handleInput(allowedKeys[e.keyCode]);
+            player.reset();
         });
+        lastTime = Date.now();
+        main(); // enter game
     }
 
     /* Go ahead and load all of the images we know we're going to need to
