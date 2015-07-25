@@ -3,6 +3,7 @@
  * prototypes, then instantiate them.
  */
 "use strict";
+
 // Enemies our player must avoid
 var Enemy = function(initX, initY, width, height, speed) {
     // Variables applied to each of our instances go here,
@@ -47,7 +48,7 @@ Player.constructor = Player;
 /*
  * Move direction + pixels by key input.
  */
-Player.prototype.handleInput = function(inputKey) {
+Player.prototype.handleInput = function(e, inputKey) {
     switch(inputKey) {
         case 'left':
             this.x -= characterWidth; 
@@ -70,7 +71,7 @@ Player.prototype.handleInput = function(inputKey) {
 Player.prototype.reset = function() {
     if(this.y < 0) { // reach water, win, restart 
         player.toInitLoc(); 
-        scoreBoard.score++;
+        scoreBoard.add(1);
     }
     if(this.y > 50+step*4) { // reach lower bound, keep still 
         this.y = 50+step*4; 

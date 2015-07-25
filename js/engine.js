@@ -32,7 +32,11 @@ var Engine = (function(global) {
     /* This function serves as the kickoff point for the game loop itself
      * and handles properly calling the update and render methods.
      */
+    // FPS Meter
+    var fpsmeter = new FPSMeter({ decimals: 0, graph: true, theme: 'dark', left: '5px' });
+
     function main() {
+        fpsmeter.tickStart();
         /* Get our time delta information which is required if your game
          * requires smooth animation. Because everyone's computer processes
          * instructions at different speeds we need a constant value that
@@ -40,7 +44,7 @@ var Engine = (function(global) {
          * computer is) - hurray time!
          */
         var now = Date.now(),
-            dt = (now - lastTime) / 1000.0;
+        dt = Math.min(1, (now - lastTime) / 1000.0);
 
         /* Call our update/render functions, pass along the time delta to
          * our update function since it may be used for smooth animation.
@@ -52,6 +56,7 @@ var Engine = (function(global) {
          * for the next time this function is called.
          */
         lastTime = now;
+        fpsmeter.tick();
 
         /* Use the browser's requestAnimationFrame function to call this
          * function again as soon as the browser is able to draw another frame.
@@ -98,8 +103,7 @@ var Engine = (function(global) {
     }
 
     /* This function detects collision of the enemy and player
-     * and score -1 when collided.
-     */
+     * and score -1 when collided.  */
     function checkCollisions() {
         allEnemies.forEach(function(enemy) {
             if(enemy.x < player.x + player.width - 30 &&
@@ -107,7 +111,7 @@ var Engine = (function(global) {
                enemy.y < player.y + player.height - 88 &&
                enemy.height + enemy.y - 88 > player.y) {
                 player.toInitLoc(); // to init location 
-                scoreBoard.score--; // collided, decrement score
+                scoreBoard.minus(1); // collided, decrement score
             }
         });
     }
@@ -205,8 +209,14 @@ var Engine = (function(global) {
         ctx.fillText("Click to choose a player", 60, 300);
         // mouse tracing
         canvas.addEventListener('mousemove', function(e){
-            mouse.x = e.clientX;
-            mouse.y = e.clientY;
+            // pageX/Y changes with page scrolling while clientX/Y don't
+            mouse.x = e.pageX - canvas.offsetLeft;
+            mouse.y = e.pageY - canvas.offsetTop;
+	    //console.log(e.pageX, e.pageY);
+	    //console.log(e.clientX, e.clientY);
+	    //console.log(canvas.scrollLeft, canvas.scrollTop);
+	    //console.log(canvas.offsetLeft, canvas.offsetTop);
+            //console.log("x,y:"+mouse.x+","+mouse.y);
         });
         // choose a player according to mouse click coordinates. 
         canvas.addEventListener("click", choosePlayer, false);
@@ -214,20 +224,20 @@ var Engine = (function(global) {
 
     // Choose player according to mouse click position.
     function choosePlayer() {
-        if(mouse.y > 370 && mouse.y < 450) { // player1
-            if(mouse.x > 415 && mouse.x < 485) {
+        if(mouse.y > 362 && mouse.y < 442) { // player1
+            if(mouse.x > 15 && mouse.x < 85) {
                 player.sprite = playerImages[0];    
                 enterGame();
             }
-            else if(mouse.x >= 518 && mouse.x < 585) { // player2
+            else if(mouse.x >= 118 && mouse.x < 185) { // player2
                 player.sprite = playerImages[1];    
                 enterGame();
             }
-            else if(mouse.x >= 618 && mouse.x < 685) { // player3
+            else if(mouse.x >= 218 && mouse.x < 285) { // player3
                 player.sprite = playerImages[2];    
                 enterGame();
             }
-            else if(mouse.x >= 715 && mouse.x < 788) { // player4
+            else if(mouse.x >= 315 && mouse.x < 388) { // player4
                 player.sprite = playerImages[3];    
                 enterGame();
             }
@@ -247,8 +257,9 @@ var Engine = (function(global) {
                 39: 'right',
                 40: 'down'
             };
-
-            player.handleInput(allowedKeys[e.keyCode]);
+            //e.stopPropagation();
+            //e.preventDefault(); // disable browser's default key actions, e.g. up/down key to scroll the page
+            player.handleInput(e, allowedKeys[e.keyCode]);
             player.reset();
         });
         lastTime = Date.now();
