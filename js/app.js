@@ -31,9 +31,16 @@ Enemy.prototype.update = function(dt) {
     }
 };
 
+function dawImgCallback(ctx, img, x, y, width, height) {
+    return function () {
+        ctx.drawImage(img, x, y, width, height);
+    };
+}
 // Draw the enemy on the screen, required method for game
 Enemy.prototype.render = function() {
-    ctx.drawImage(Resources.get(this.sprite), this.x, this.y, this.width, this.height);
+    var img = new Image();
+    img.onload = dawImgCallback(ctx, img, this.x, this.y, this.width, this.height);
+    img.src = this.sprite; 
 };
 
 // Now write your own player class
